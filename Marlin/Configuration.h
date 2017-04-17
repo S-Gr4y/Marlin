@@ -622,7 +622,7 @@
  */
 #define X_PROBE_OFFSET_FROM_EXTRUDER -25  // X offset: -left  +right  [of the nozzle]
 #define Y_PROBE_OFFSET_FROM_EXTRUDER -30  // Y offset: -front +behind [the nozzle]
-#define Z_PROBE_OFFSET_FROM_EXTRUDER -1.46   // Z offset: -below +above  [the nozzle]
+#define Z_PROBE_OFFSET_FROM_EXTRUDER -1.33   // Z offset: -below +above  [the nozzle] last mesurement with buildtak
 
 // X and Y axis travel speed (mm/m) between probes
 #define XY_PROBE_SPEED 8000
@@ -1127,7 +1127,7 @@
   #define NOZZLE_CLEAN_TRIANGLES  3
 
   // Specify positions as { X, Y, Z }
-  #define NOZZLE_CLEAN_START_POINT { 30, 30, (Z_MIN_POS + 1)}
+  #define NOZZLE_CLEAN_START_POINT { 10, 10, (Z_MIN_POS + 1)}
   #define NOZZLE_CLEAN_END_POINT   {100, 60, (Z_MIN_POS + 1)}
 
   // Circular pattern radius
