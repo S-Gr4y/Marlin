@@ -281,11 +281,20 @@
   // Play a little bit with small adjustments (0.5mm) and check the behaviour.
   // The M119 (endstops report) will start reporting the Z2 Endstop as well.
 
-  //#define Z_DUAL_ENDSTOPS
+  #define Z_DUAL_ENDSTOPS
 
   #if ENABLED(Z_DUAL_ENDSTOPS)
-    #define Z2_USE_ENDSTOP _XMAX_
-    #define Z_DUAL_ENDSTOPS_ADJUSTMENT  0  // use M666 command to determine/test this value
+
+
+    #define Z2_STEP_PIN E2_STEP_PIN           // Stepper to be used to Z2 axis.
+    #define Z2_ENABLE_PIN E2_ENABLE_PIN
+    #define Z2_MAX_PIN 36                     //Endstop used for Z2 axis. In this case I'm using XMAX in a Rumba Board (pin 36)
+    const bool Z2_MAX_ENDSTOP_INVERTING = false;
+    #define DISABLE_XMAX_ENDSTOP              //Better to disable the XMAX to avoid conflict. Just rename "XMAX_ENDSTOP" by the endstop you are using for Z2 axis.
+
+    //Original Marlin value
+    //#define Z2_USE_ENDSTOP _XMAX_
+    //#define Z_DUAL_ENDSTOPS_ADJUSTMENT  0  // use M666 command to determine/test this value
   #endif
 
 #endif // Z_DUAL_STEPPER_DRIVERS
@@ -317,6 +326,12 @@
   //                                    actions of the first x-carriage. This allows the printer to print 2 arbitrary items at
   //                                    once. (2nd extruder x offset and temp offset are set using: M605 S2 [Xnnn] [Rmmm])
 
+
+  // Pins for second x-carriage stepper driver (defined here to avoid further complicating pins.h)
+  #define X2_ENABLE_PIN 29
+  #define X2_STEP_PIN 25
+  #define X2_DIR_PIN 23
+
   // This is the default power-up mode which can be later using M605.
   #define DEFAULT_DUAL_X_CARRIAGE_MODE DXC_FULL_CONTROL_MODE
 
@@ -340,7 +355,7 @@
 #define Y_HOME_BUMP_MM 5
 #define Z_HOME_BUMP_MM 2
 #define HOMING_BUMP_DIVISOR {2, 2, 4}  // Re-Bump Speed Divisor (Divides the Homing Feedrate)
-//#define QUICK_HOME  //if this is defined, if both x and y are to be homed, a diagonal move will be performed initially.
+#define QUICK_HOME  //if this is defined, if both x and y are to be homed, a diagonal move will be performed initially.
 
 // When G28 is called, this option will make Y home before X
 //#define HOME_Y_BEFORE_X
@@ -361,7 +376,7 @@
 // Default stepper release if idle. Set to 0 to deactivate.
 // Steppers will shut down DEFAULT_STEPPER_DEACTIVE_TIME seconds after the last move when DISABLE_INACTIVE_? is true.
 // Time can be set by M18 and M84.
-#define DEFAULT_STEPPER_DEACTIVE_TIME 120
+#define DEFAULT_STEPPER_DEACTIVE_TIME 60
 #define DISABLE_INACTIVE_X true
 #define DISABLE_INACTIVE_Y true
 #define DISABLE_INACTIVE_Z true  // set to false if the nozzle will fall down on your printed part when print has finished.
@@ -395,6 +410,13 @@
 // if unwanted behavior is observed on a user's machine when running at very slow speeds.
 #define MINIMUM_PLANNER_SPEED 0.05// (mm/sec)
 
+// MS1 MS2 Stepper Driver Microstepping mode table
+#define MICROSTEP1 LOW,LOW
+#define MICROSTEP2 HIGH,LOW
+#define MICROSTEP4 LOW,HIGH
+#define MICROSTEP8 HIGH,HIGH
+#define MICROSTEP16 HIGH,HIGH
+
 // Microstep setting (Only functional when stepper driver microstep pins are connected to MCU.
 #define MICROSTEP_MODES {16,16,16,16,16} // [1,2,4,8,16]
 
@@ -419,7 +441,7 @@
  *    M909, M910 & LCD - only PRINTRBOARD_REVF & RIGIDBOARD_V2
  */
 //#define PWM_MOTOR_CURRENT {1300, 1300, 1250} // Values in milliamps
-//#define DIGIPOT_MOTOR_CURRENT {135,135,135,135,135} // Values 0-255 (RAMBO 135 = ~0.75A, 185 = ~1A)
+#define DIGIPOT_MOTOR_CURRENT {135,135,135,135,135} // Values 0-255 (RAMBO 135 = ~0.75A, 185 = ~1A)
 //#define DAC_MOTOR_CURRENT_DEFAULT { 70, 80, 90, 80 } // Default drive percent - X, Y, Z, E axis
 
 // Uncomment to enable an I2C based DIGIPOT like on the Azteeg X3 Pro
@@ -466,7 +488,7 @@
   #define SDCARD_RATHERRECENTFIRST  //reverse file order of sd card menu display. Its sorted practically after the file system block order.
   // if a file is deleted, it frees a block. hence, the order is not purely chronological. To still have auto0.g accessible, there is again the option to do that.
   // using:
-  //#define MENU_ADDAUTOSTART
+  #define MENU_ADDAUTOSTART
 
   /**
    * Sort SD file listings in alphabetical order.
@@ -566,7 +588,7 @@
 
 // The hardware watchdog should reset the microcontroller disabling all outputs,
 // in case the firmware gets stuck and doesn't do temperature regulation.
-#define USE_WATCHDOG
+//#define USE_WATCHDOG
 
 #if ENABLED(USE_WATCHDOG)
   // If you have a watchdog reboot in an ArduinoMega2560 then the device will hang forever, as a watchdog reset will leave the watchdog on.
@@ -604,11 +626,14 @@
 // Hooke's law says:    force = k * distance
 // Bernoulli's principle says:  v ^ 2 / 2 + g . h + pressure / density = constant
 // so: v ^ 2 is proportional to number of steps we advance the extruder
-//#define ADVANCE
+#define ADVANCE
 
 #if ENABLED(ADVANCE)
-  #define EXTRUDER_ADVANCE_K .0
-  #define D_FILAMENT 2.85
+#define EXTRUDER_ADVANCE_K .0
+  #define D_FILAMENT 1.75
+  #define STEPS_MM_E 100.47095761381482
+  #define EXTRUTION_AREA (0.25 * D_FILAMENT * D_FILAMENT * 3.14159)
+  #define STEPS_PER_CUBIC_MM_E (axis_steps_per_unit[E_AXIS]/ EXTRUTION_AREA)   
 #endif
 
 /**
@@ -695,6 +720,32 @@
 // Control heater 0 and heater 1 in parallel.
 //#define HEATERS_PARALLEL
 
+// If you are using a RAMPS board or cheap E-bay purchased boards that do not detect when an SD card is inserted
+// You can get round this by connecting a push button or single throw switch to the pin defined as SDCARDCARDDETECT
+// in the pins.h file.  When using a push button pulling the pin to ground this will need inverted.  This setting should
+// be commented out otherwise
+#define SDCARDDETECTINVERTED
+
+#ifdef ULTIPANEL
+ #undef SDCARDDETECTINVERTED
+#endif
+
+// Power Signal Control Definitions
+// By default use ATX definition
+#ifndef POWER_SUPPLY
+  #define POWER_SUPPLY 1
+#endif
+// 1 = ATX
+#if (POWER_SUPPLY == 1)
+  #define PS_ON_AWAKE  LOW
+  #define PS_ON_ASLEEP HIGH
+#endif
+// 2 = X-Box 360 203W
+#if (POWER_SUPPLY == 2)
+  #define PS_ON_AWAKE  HIGH
+  #define PS_ON_ASLEEP LOW
+#endif
+
 //===========================================================================
 //================================= Buffers =================================
 //===========================================================================
@@ -713,7 +764,7 @@
 
 // The ASCII buffer for serial input
 #define MAX_CMD_SIZE 96
-#define BUFSIZE 4
+#define BUFSIZE 5
 
 // Transfer Buffer Size
 // To save 386 bytes of PROGMEM (and TX_BUFFER_SIZE+3 bytes of RAM) set to 0.
@@ -767,11 +818,11 @@
  * Requires an LCD display.
  * This feature is required for the default FILAMENT_RUNOUT_SCRIPT.
  */
-//#define FILAMENT_CHANGE_FEATURE
+#define FILAMENT_CHANGE_FEATURE
 #if ENABLED(FILAMENT_CHANGE_FEATURE)
-  #define FILAMENT_CHANGE_X_POS 3             // X position of hotend
-  #define FILAMENT_CHANGE_Y_POS 3             // Y position of hotend
-  #define FILAMENT_CHANGE_Z_ADD 10            // Z addition of hotend (lift)
+  #define FILAMENT_CHANGE_X_POS 87.5             // X position of hotend
+  #define FILAMENT_CHANGE_Y_POS 15             // Y position of hotend
+  #define FILAMENT_CHANGE_Z_ADD 15            // Z addition of hotend (lift)
   #define FILAMENT_CHANGE_XY_FEEDRATE 100     // X and Y axes feedrate in mm/s (also used for delta printers Z axis)
   #define FILAMENT_CHANGE_Z_FEEDRATE 5        // Z axis feedrate in mm/s (not used for delta printers)
   #define FILAMENT_CHANGE_RETRACT_FEEDRATE 60 // Initial retract feedrate in mm/s
@@ -795,7 +846,7 @@
   #define FILAMENT_CHANGE_NUMBER_OF_ALERT_BEEPS 5 // Number of alert beeps before printer goes quiet
   #define FILAMENT_CHANGE_NO_STEPPER_TIMEOUT  // Enable to have stepper motors hold position during filament change
                                               // even if it takes longer than DEFAULT_STEPPER_DEACTIVE_TIME.
-  //#define PARK_HEAD_ON_PAUSE                // Go to filament change position on pause, return to print position on resume
+  #define PARK_HEAD_ON_PAUSE                // Go to filament change position on pause, return to print position on resume
 #endif
 
 // @section tmc
