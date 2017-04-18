@@ -622,7 +622,7 @@
  */
 #define X_PROBE_OFFSET_FROM_EXTRUDER -25  // X offset: -left  +right  [of the nozzle]
 #define Y_PROBE_OFFSET_FROM_EXTRUDER -30  // Y offset: -front +behind [the nozzle]
-#define Z_PROBE_OFFSET_FROM_EXTRUDER -1.33   // Z offset: -below +above  [the nozzle] last mesurement with buildtak
+#define Z_PROBE_OFFSET_FROM_EXTRUDER -1.32   // Z offset: -below +above  [the nozzle] last mesurement with buildtak
 
 // X and Y axis travel speed (mm/m) between probes
 #define XY_PROBE_SPEED 8000
@@ -870,7 +870,7 @@
   #define GRID_MAX_POINTS_Y GRID_MAX_POINTS_X
 
   // Set the boundaries for probing (where the probe can reach).
-  #define LEFT_PROBE_BED_POSITION 10
+  #define LEFT_PROBE_BED_POSITION 15
   #define RIGHT_PROBE_BED_POSITION 185
   #define FRONT_PROBE_BED_POSITION 5
   #define BACK_PROBE_BED_POSITION 150

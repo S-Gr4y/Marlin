@@ -682,6 +682,7 @@ void kill_screen(const char* lcd_msg) {
     void lcd_sdcard_stop() {
       card.stopSDPrint();
       clear_command_queue();
+      enqueue_and_echo_commands_P(PSTR("G1 X0 Y190 F5000"));
       quickstop_stepper();
       print_job_timer.stop();
       #if ENABLED(AUTOTEMP)
